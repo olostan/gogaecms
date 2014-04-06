@@ -9,6 +9,8 @@ import (
 	"encoding/gob"
 	"html/template"
 	"net/http"
+	"mime"
+	"strings"
 )
 
 type GAEHandler struct {
@@ -63,9 +65,13 @@ func (h *GAEHandler) PutToCache(req *Request, content *Content) {
 	}
 }
 func (h *GAEHandler) SendContent(req *Request, content *Content) {
-	//	mimeType := mime.TypeByExtension(req.fileName[strings.LastIndex(req.fileName, "."):])
+	mimeType := mime.TypeByExtension(req.fileName[strings.LastIndex(req.fileName, "."):])
+	req.w.Header().Add("Cache-Control", "public")
+
 	if content.BlobKey == "" {
-		//		req.w.Header().Add("Content-Type", mimeType)
+		req.w.Header().Add("ETag", content.ETag)
+		req.w.Header().Add("Content-Type", mimeType)
+
 		req.w.Write(content.Data)
 	} else {
 		blobstore.Send(req.w, appengine.BlobKey(content.BlobKey))

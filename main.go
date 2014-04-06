@@ -2,7 +2,6 @@ package gogaecms
 
 import (
 	"bytes"
-	"mime"
 	"net/http"
 	"strings"
 )
@@ -73,10 +72,5 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotModified)
 		return
 	}
-
-	mimeType := mime.TypeByExtension(fileName[strings.LastIndex(fileName, "."):])
-	w.Header().Add("Content-Type", mimeType)
-	w.Header().Add("Cache-Control", "public")
-	w.Header().Add("ETag", content.ETag)
 	contentHandler.SendContent(&request, content)
 }
