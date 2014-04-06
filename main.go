@@ -12,7 +12,6 @@ func init() {
 
 	contentHandler = NewLocalHandler("site")
 	//	contentHandler = new(GAEHandler);
-
 	http.HandleFunc("/update", updateHandler)
 	http.HandleFunc("/", handler)
 

@@ -4,5 +4,21 @@ runtime: go
 api_version: go1
 
 handlers:
+- url: /admin/(datas|templates|settings)?$
+  static_files: admin/index.html
+  upload: admin/index.html
+
+- url: /admin
+  static_dir: admin
+
 - url: /.*
   script: _go_app
+
+admin_console:
+  pages:
+  - name: Datas
+    url: /admin/datas.html
+  - name: Templates
+    url: /admin/templates.html
+  - name: Import/Export settings
+    url: /admin/settings.html
