@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http"
 	"strings"
+	"html/template"
 )
 
 var contentHandler ContentHandler
@@ -50,13 +51,30 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			templates, err := contentHandler.LoadTemplates(&request)
+			root := template.New("root");
+			funcMap := template.FuncMap{
+				"data": func (storeName,keyName string) string {
+					store := datas[storeName];
+					for _,row := range store {
+						if row[0] == keyName {
+							return row[1];
+						}
+					}
+					return ""
+				},
+			}
+			root.Funcs(funcMap);
+			templates, err := contentHandler.LoadTemplates(&request,root)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+//			datas["global"] = []DataRecord{[]string{"file",fileName[1:]}};
+			current := templates.Lookup(fileName[1:]);
+			templates.AddParseTree("body",current.Tree);
 			buf := new(bytes.Buffer)
-			err = templates.ExecuteTemplate(buf, name, datas)
+			//err = templates.ExecuteTemplate(buf, name, datas)
+			err = templates.ExecuteTemplate(buf, "layout.html", datas)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return

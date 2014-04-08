@@ -33,5 +33,5 @@ type ContentHandler interface {
 	SendContent(req *Request, content *Content)
 
 	LoadDatas(req *Request) (DataEntities, error)
-	LoadTemplates(req *Request) (*template.Template, error)
+	LoadTemplates(req *Request,root *template.Template) (*template.Template, error)
 }

@@ -91,10 +91,10 @@ func (h *GAEHandler) LoadDatas(req *Request) (DataEntities, error) {
 	dec.Decode(&result)
 	return result, nil
 }
-func (h *GAEHandler) LoadTemplates(req *Request) (*template.Template, error) {
+func (h *GAEHandler) LoadTemplates(req *Request,root *template.Template) (*template.Template, error) {
 	q := datastore.NewQuery("Content").
 		Filter("BlobKey =", "")
-	templates := template.New("root")
+	//templates := template.New("root")
 
 	var contents []Content
 	if keys, err := q.GetAll(req.context.(appengine.Context), &contents); err != nil {
@@ -103,11 +103,11 @@ func (h *GAEHandler) LoadTemplates(req *Request) (*template.Template, error) {
 		for i := range contents {
 			var k *datastore.Key = keys[i]
 			name := k.StringID()[1:]
-			_, err = templates.New(name).Parse(string(contents[i].Data[:]))
+			_, err = root.New(name).Parse(string(contents[i].Data[:]))
 			if err != nil {
 				return nil, err
 			}
 		}
-		return templates, nil
+		return root, nil
 	}
 }

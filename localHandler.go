@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 
 	"io/ioutil"
+	"strings"
+	"mime"
 )
 
 type LocalHandler struct {
@@ -47,8 +49,11 @@ func (h *LocalHandler) PutToCache(_ *Request, _ *Content) {
 }
 
 func (h *LocalHandler) SendContent(req *Request, content *Content) {
-	req.w.Header().Add("Content-Type", "text/html")
+	mimeType := mime.TypeByExtension(req.fileName[strings.LastIndex(req.fileName, "."):])
+	req.w.Header().Add("Cache-Control", "public")
 	req.w.Header().Add("ETag", content.ETag)
+	req.w.Header().Add("Content-Type", mimeType)
+
 	req.w.Write(content.Data)
 
 }
@@ -90,8 +95,8 @@ func loadCSV(file io.Reader) ([]DataRecord, error) {
 	return result, nil
 }
 
-func (h *LocalHandler) LoadTemplates(_ *Request) (*template.Template, error) {
+func (h *LocalHandler) LoadTemplates(_ *Request,root *template.Template) (*template.Template, error) {
 	pattern := filepath.Join(h.folder, "*.html")
-	template := template.Must(template.ParseGlob(pattern))
+	template := template.Must(root.ParseGlob(pattern))
 	return template, nil
 }

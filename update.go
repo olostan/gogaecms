@@ -96,7 +96,8 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(rc)
 
-		if f.FileInfo().Size() > 1024*10 {
+		//if f.FileInfo().Size() > 1024*20 {
+		if !strings.HasSuffix(fileName,".html") {
 			content = Content{
 				Data: nil,
 			}
